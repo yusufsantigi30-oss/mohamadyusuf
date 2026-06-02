@@ -61,36 +61,12 @@ function updateActiveNavLink() {
     });
 }
 
-// Project Filter
-function filterProjects(category) {
-    // Update active filter button
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-
-    // Filter projects
-    const projects = document.querySelectorAll('.project-card');
-    projects.forEach(project => {
-        project.classList.remove('show');
-        if (category === 'all' || project.dataset.category === category) {
-            setTimeout(() => {
-                project.classList.add('show');
-            }, 50);
-        }
-    });
-}
-
-// Initialize projects on page load
+// Initialize on page load
 window.addEventListener('load', () => {
-    // Show all projects initially
-    document.querySelectorAll('.project-card').forEach(project => {
-        project.classList.add('show');
-    });
-
     // Animate skill bars
     animateSkillBars();
-
+    // Animate counters
+    animateCounters();
     // Welcome message
     console.log('Selamat datang di website Mohamad Yusuf! 🚀');
 });
@@ -136,7 +112,7 @@ if (contactForm) {
         window.location.href = mailtoLink;
 
         // Show success message
-        alert('Terima kasih! Pesan Anda akan dikirim melalui email default Anda.');
+        alert('Terima kasih! Pesan Anda akan dikirim melalui email.');
         contactForm.reset();
     });
 }
@@ -157,7 +133,7 @@ const observer = new IntersectionObserver(entries => {
 }, observerOptions);
 
 // Observe elements
-document.querySelectorAll('.about-text, .experience-item, .skill-category, .project-card, .blog-card, .testimonial-card, .stat-card').forEach(el => {
+document.querySelectorAll('.about-text, .experience-item, .skill-category, .project-card, .blog-card, .stat-card').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(20px)';
     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
@@ -195,7 +171,12 @@ function animateCounters() {
             if (entry.isIntersecting) {
                 const target = entry.target;
                 const finalValue = parseInt(target.textContent);
-                const isPercentage = target.textContent.includes('%');
+                const isSpecial = target.textContent.includes('∞');
+                
+                if (isSpecial) {
+                    observer.unobserve(target);
+                    return;
+                }
                 
                 let currentValue = 0;
                 const increment = Math.ceil(finalValue / 50);
@@ -206,7 +187,7 @@ function animateCounters() {
                         currentValue = finalValue;
                         clearInterval(counter);
                     }
-                    target.textContent = currentValue + (isPercentage ? '%' : '+');
+                    target.textContent = currentValue + '+';
                 }, 30);
 
                 observer.unobserve(target);
@@ -216,8 +197,6 @@ function animateCounters() {
 
     statCards.forEach(card => observer.observe(card));
 }
-
-window.addEventListener('load', animateCounters);
 
 // Add smooth page transitions
 window.addEventListener('beforeunload', () => {
